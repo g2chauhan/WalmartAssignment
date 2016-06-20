@@ -1,7 +1,6 @@
 $(document).ready(function() {
     var apiKey = "b4j7c87qgxpc5nvztz3uaqur";
 
-    var request = new XMLHttpRequest();
 
 
 
@@ -21,9 +20,9 @@ $(document).ready(function() {
 
 
 function searchProduct() {
-    var query = document.getElementById('form-input').value;
+    var query = $('#form-input').val();
     $("#outputArea2").hide();
-    
+
     $("#output1").empty();
 
     $.ajax({
@@ -44,6 +43,7 @@ function searchProduct() {
 
 
             //});
+            console.log(productSearchResult);
             getRecommendedResponses(productSearchResult.items[0].itemId)
         }
 
