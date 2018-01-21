@@ -1,9 +1,7 @@
 # Overview of Solution:
 
 1. **Technical Stacks**:
-  - Front End: HTML
-  - Back End: JQuery, javascript
-
+  - Languages used: HTML, jQuery, JavaScript, CSS
 
 2. **Instructions for executing the Solution**
   - Install the CORS browser plugin from this link: https://goo.gl/LHChNQ
