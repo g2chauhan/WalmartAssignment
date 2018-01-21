@@ -8,8 +8,6 @@ $(document).ready(function() {
         window.filteredResponse = [];
         $(".loading").show();
         searchProduct();
-
-
     });
 });
 
@@ -17,14 +15,16 @@ $(document).ready(function() {
 function searchProduct() {
     var query = $("#form-input").val();
 
-    var url = 'http://api.walmartlabs.com/v1/search?apiKey=' + window.apiKey + '&query=' + query + "&_ts=" + (new Date()).getMilliseconds();
+    var url = 'http://api.walmartlabs.com/v1/search?apiKey=' + window.apiKey 
+        + '&query=' + query + "&_ts=" + (new Date()).getMilliseconds();
 
     var callback = function(response) {
         if (!!response.errors) {
             alert(("No results found !"));
             return;
         }
-        getRecommendedResponses(response.items[0].itemId) // selects the item ID of the first product and sends it to recommendation API
+        // selects the item ID of the first product and sends it to recommendation API
+        getRecommendedResponses(response.items[0].itemId);
     }
 
     $.ajax({
@@ -40,7 +40,8 @@ function searchProduct() {
 // Gets a list of recommended products using the item ID of the first product from the search API
 function getRecommendedResponses(firstProductId) {
 
-    var url = 'http://api.walmartlabs.com/v1/nbp?apiKey=' + window.apiKey + '&itemId=' + firstProductId + "&format=json&_ts=" + (new Date()).getMilliseconds();
+    var url = 'http://api.walmartlabs.com/v1/nbp?apiKey=' + window.apiKey + '&itemId=' 
+        + firstProductId + "&format=json&_ts=" + (new Date()).getMilliseconds();
 
 
     var callback = function(response) {
@@ -50,10 +51,11 @@ function getRecommendedResponses(firstProductId) {
         }
         var count =0;
         $.each(response, function(key, value) {
-          if(count > 9) return;                       // considers only 10 recommended products
-            getProductReview(value.itemId);           //for each recommended product, it sends the itemId to Reviews API for getting overall rating
+            // considers only 10 recommended products
+            if(count > 9) return;
+            //for each recommended product, it sends the itemId to Reviews API for getting overall rating  
+            getProductReview(value.itemId);
             count++;
-
         });
 
 
@@ -62,12 +64,12 @@ function getRecommendedResponses(firstProductId) {
         });
 
         $.each(window.filteredResponse, function(key,value) {
-         var a='<tr><td>'+value.itemId+'</td><td>'+value.name+'</td><td>'+value.salePrice+'</td><td>'+value.averageOverallRating+'</td></tr>';
-         $(".loading").hide();
-         $("#outputAreaDiv").show();
-        $('#outputBody').append(a);
+            var a='<tr><td>' + value.itemId + '</td><td>' + value.name + '</td><td>' + value.salePrice
+                + '</td><td>' + value.averageOverallRating + '</td></tr>';
+            $(".loading").hide();
+            $("#outputAreaDiv").show();
+            $('#outputBody').append(a);
         });
-
     }
     
     $.ajax({
@@ -84,16 +86,18 @@ function getRecommendedResponses(firstProductId) {
 
 // Gets the rating of recommended products using the itemID of each recommended products
 function getProductReview(recommendedProductId) {
-    var url = 'http://api.walmartlabs.com/v1/reviews/' + recommendedProductId + '?apiKey=' + window.apiKey + '&_ts=' + (new Date()).getMilliseconds();
+    var url = 'http://api.walmartlabs.com/v1/reviews/' + recommendedProductId 
+        + '?apiKey=' + window.apiKey + '&_ts=' + (new Date()).getMilliseconds();
 
     // Selects only the required info from the Reviews API response
     function checkResponse(response){
-      return{
+      return {
         "itemId":response.itemId,
         "name":response["name"],
         "salePrice":response.salePrice,
-        "averageOverallRating": !!response.reviewStatistics ? response.reviewStatistics.averageOverallRating : "0.00" // if there is no rating info, then assuming it as zero
-
+        "averageOverallRating": 
+            // if there is no rating info, then assuming it as zero
+            !!response.reviewStatistics ? response.reviewStatistics.averageOverallRating : "0.00"
       }
     }
 
@@ -103,9 +107,12 @@ function getProductReview(recommendedProductId) {
         dataType: 'json',
         async: false,
         success: function (response) {
-            window.filteredResponse.push(checkResponse(response));  /* response from Reviews API is passed to checkResponse function
-                                                                     which selects only the required information(product id, name, price, rating)
-                                                                     and each of this info is pushed into a filteredResponse array */
+            /* 
+                response from Reviews API is passed to checkResponse function
+                which selects only the required information(product id, name, price, rating)
+                and each of this info is pushed into a filteredResponse array
+            */
+            window.filteredResponse.push(checkResponse(response));
         },
         error: function(e) {
             console.log(e);
