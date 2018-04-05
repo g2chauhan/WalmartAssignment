@@ -1,29 +1,14 @@
 $(document).ready(function () {
     $("#searchButton").on('click', function () {
-        setUpDom();
+        $("#recommendedProductsResultBody").empty();
+        $("#searchResultBody").empty();
+        $("#recommendedProductsResultDiv").hide();
+        $("#searchResultDiv").hide();
+        window.filteredResponse = [];
+        $(".loading").show();
         searchProduct();
     });
-
-    // handle enter key press
-    $("#form-input").keypress(function (e) {
-        if (e.which === 13) {
-            $("#searchButton").trigger("click");
-        }
-    });
 });
-
-
-
-
-
-function setUpDom() {
-    $("#recommendedProductsResultBody").empty();
-    $("#searchResultBody").empty();
-    $("#recommendedProductsResultDiv").hide();
-    $("#searchResultDiv").hide();
-    window.filteredResponse = [];
-    $(".loading").show();
-}
 
 
 // search for Products
@@ -93,9 +78,9 @@ function getRecommendedProducts(firstSearchProductId) {
         });
         $("#recommendedProductsResultDiv").show();
         $.each(window.filteredResponse, function (key, value) {
-            var a = '<tr><td>' + value.itemId + '</td><td>' + value.name + '</td><td>' + value.salePrice
+            let rowData = '<tr><td>' + value.itemId + '</td><td>' + value.name + '</td><td>' + value.salePrice
                 + '</td><td>' + value.averageOverallRating + '</td></tr>';
-            $('#recommendedProductsResultBody').append(a);
+            $('#recommendedProductsResultBody').append(rowData);
         });
     };
 
@@ -131,7 +116,7 @@ function getProductReview(recommendedProductId) {
     $.ajax({
         url: "ProductReviewServlet",
         type: 'GET',
-        data: {recommendedProductId: recommendedProductId},
+        data: {recommendedProductId:recommendedProductId},
         async: false,
         success: function (response) {
             /* 
