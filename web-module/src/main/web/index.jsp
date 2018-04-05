@@ -16,13 +16,16 @@
     <div class="left">
         <!-- Form Begins -->
         <form>
-            <h3>Search for a Product</h3>
-            <label><input type="text" placeholder="Enter product name" id="form-input"/></label>
+            <label><input type="text" placeholder="Search for a product" id="form-input"/></label>
             <br/><br/>
             <input type="button" id="searchButton" value="Search"/> &nbsp&nbsp
             <button type="reset"> Reset</button>
         </form>
         <!-- Form Ends -->
+    </div>
+
+    <div class="left">
+        <div id = "errorPrint"></div>
     </div>
     <div class="left">
         <div id="searchResultDiv">

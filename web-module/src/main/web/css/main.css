@@ -33,10 +33,6 @@ table {
     border-spacing: 15px;
 }
 
-tr {
-    border: 1px;
-}
-
 .left {
     left: 10%;
     position: relative;
