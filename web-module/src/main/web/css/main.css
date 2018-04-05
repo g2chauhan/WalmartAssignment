@@ -1,0 +1,39 @@
+body {
+    width: 100%;
+    height: 100%;
+}
+
+.loading {
+    background-image: url("../images/loading.gif");
+    background-repeat: no-repeat;
+    left: 50%;
+    top: 50%;
+    width: 120px;
+    height: 120px;
+    position: absolute;
+    display: none;
+}
+
+.container {
+    font-family: sans-serif;
+    font-size: 14px;
+    width: inherit;
+    height: inherit;
+}
+
+#recommendedProductsResultDiv {
+    display: none;
+}
+
+#searchResultDiv {
+    display: none;
+}
+
+table {
+    border-spacing: 15px;
+}
+
+.left {
+    left: 10%;
+    position: relative;
+}
