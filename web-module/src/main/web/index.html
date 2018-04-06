@@ -1,0 +1,72 @@
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" type="image/png" href="images/favicon.png">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+</head>
+
+<title>Walmart Web App</title>
+<body>
+<center><h2>Walmart</h2></center>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+            <div id="imaginary_container">
+                <div class="input-group stylish-input-group">
+                    <input type="text" class="form-control" placeholder="Search for a product" id="form-input">
+                    <span class="input-group-addon">
+                        <button type="button" id="searchButton">
+                            <span class="glyphicon glyphicon-search"></span>
+                        </button>
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="left">
+    <div id="errorPrint"></div>
+</div>
+<div class="container">
+    <div id="searchResultDiv">
+        <h3>Search Results</h3>
+        <table class="table table-bordered">
+            <thead>
+            <th>Item ID</th>
+            <th>Name</th>
+            <th>Sale Price</th>
+            <th>Customer Rating</th>
+            <th></th>
+            </thead>
+            <tbody id="searchResultBody">
+            </tbody>
+        </table>
+    </div>
+
+    <div id="recommendedProductsResultDiv">
+        <h3>Recommended Products</h3>
+        <table class="table table-bordered">
+            <thead>
+            <th>Item ID</th>
+            <th>Name</th>
+            <th>Sale Price</th>
+            <th>Overall Rating</th>
+            </thead>
+            <tbody id="recommendedProductsResultBody">
+            </tbody>
+        </table>
+    </div>
+</div>
+<div class="loading"></div>
+</body>
+</html>

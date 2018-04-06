@@ -10,6 +10,19 @@ $(document).ready(function () {
     });
 });
 
+$(document).on('click',"button.addToCart", function () {
+    const rowElement = $(this).parent().parent();
+    const rowData = rowElement.children("td").map(function () {
+        return $(this).text();
+    }).get();
+
+    $.post('queryDb.php', rowData).done(function (data) {
+        console.log(data);
+    });
+});
+
+
+
 // Gets the rating of recommended products using the itemID of each recommended products
 function getProductReview(recommendedProductId) {
 
@@ -110,7 +123,7 @@ function searchProduct() {
             $.each(searchResponse.items, function (key, value) {
                 let customerRating = !value.customerRating ? "--" : value.customerRating;
                 let rowData = '<tr><td>' + value.itemId + '</td><td>' + value.name + '</td><td>' + value.salePrice
-                    + '</td><td>' + customerRating + '</td></tr>';
+                    + '</td><td>' + customerRating + '</td><td><button class="addToCart">Add To Cart</button></td></tr>';
                 $('#searchResultBody').append(rowData);
             });
 
