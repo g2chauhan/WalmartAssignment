@@ -15,29 +15,39 @@
 
 <title>Walmart Web App</title>
 <body>
-<center><h2>Walmart</h2></center>
 
-<div class="container">
-    <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
-            <div id="imaginary_container">
-                <div class="input-group stylish-input-group">
-                    <input type="text" class="form-control" placeholder="Search for a product" id="form-input">
-                    <span class="input-group-addon">
+
+<div class="row">
+    <div class="col-sm-6 col-sm-offset-3">
+        <div id="imaginary_container">
+            <center><h2>Walmart</h2></center>
+            <div class="input-group stylish-input-group">
+                <input type="text" class="form-control" placeholder="Search for a product" id="form-input">
+                <span class="input-group-addon">
                         <button type="button" id="searchButton">
                             <span class="glyphicon glyphicon-search"></span>
                         </button>
                     </span>
-                </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="left">
-    <div id="errorPrint"></div>
-</div>
+
 <div class="container">
+    <div id="messagePrint"></div>
+    <div id="cartResultDiv">
+        <h3>Cart Items</h3>
+        <table class="table table-bordered">
+            <thead>
+            <th>Item ID</th>
+            <th>Name</th>
+            <th>Price</th>
+            </thead>
+            <tbody id="cartBody">
+            </tbody>
+        </table>
+    </div>
     <div id="searchResultDiv">
         <h3>Search Results</h3>
         <table class="table table-bordered">
@@ -70,3 +80,4 @@
 <div class="loading"></div>
 </body>
 </html>
+

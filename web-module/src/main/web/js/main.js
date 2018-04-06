@@ -2,6 +2,7 @@ $(document).ready(function () {
     $("#searchButton").on('click', function () {
         $("#recommendedProductsResultBody").empty();
         $("#searchResultBody").empty();
+        $("#messagePrint").empty();
         $("#recommendedProductsResultDiv").hide();
         $("#searchResultDiv").hide();
         window.recommendedProductsList = [];
@@ -10,18 +11,68 @@ $(document).ready(function () {
     });
 });
 
+// show cart items
+$(document).on('click', "button#showCart", function() {
+    $.post('view-cart.php').done(function(data) {
+        // const jsonData = JSON.parse(data);
+        $("#cartResultDiv").show();
+
+        const jsonData = [
+            {
+                "ITEMID": "10291863",
+                "PRODUCTNAME": "Carnation Vitamin D Added Evaporated Milk, 12 oz",
+                "PRICE": "1.48"
+            },
+            {
+                "ITEMID": "35506194",
+                "PRODUCTNAME": "Horizon Organic 1% Organic Lowfat Milk, 8 fl oz, 6 ct",
+                "PRICE": "6.42"
+            },
+            {
+                "ITEMID": "38125809",
+                "PRODUCTNAME": "Yoo-Hoo Chocolate Milk Fridge Pack, 12 pk",
+                "PRICE": "5.78"
+            },
+            {
+                "ITEMID": "28645690",
+                "PRODUCTNAME": "Rice Dream Organic Original Rice Drink, 64 fl oz",
+                "PRICE": "3.48"
+            },
+            {
+                "ITEMID": "24389397",
+                "PRODUCTNAME": "Nestle Nesquik Chocolate Lowfat Milk, 8 fl oz, 10 count",
+                "PRICE": "7.98"
+            },
+            {
+                "ITEMID": "35506192",
+                "PRODUCTNAME": "Horizon Organic Chocolate Organic Lowfat Milk, 8 fl oz, 12 ct",
+                "PRICE": "11.98"
+            }
+        ];
+
+        $('#cartBody').html("");
+        $.each(jsonData, function (key, value) {
+            let rowData = '<tr><td>' + value.ITEMID + '</td><td>' + value.PRODUCTNAME + '</td><td>' + value.PRICE
+                + '</td></tr>';
+            $('#cartBody').append(rowData);
+        });
+    });
+});
+
+// trigger adding to cart database
 $(document).on('click',"button.addToCart", function () {
+    $("#messagePrint").empty();
     const rowElement = $(this).parent().parent();
     const rowData = rowElement.children("td").map(function () {
         return $(this).text();
     }).get();
 
-    $.post('queryDb.php', rowData).done(function (data) {
+    const stringRowData = JSON.stringify(rowData);
+    $.post('add-to-cart.php', {stringRowData: stringRowData}).done(function (data) {
         console.log(data);
+        $("#messagePrint").append("Added to cart! " + " <button id='showCart'>Show Cart</button>");
     });
 });
-
-
 
 // Gets the rating of recommended products using the itemID of each recommended products
 function getProductReview(recommendedProductId) {
@@ -32,9 +83,9 @@ function getProductReview(recommendedProductId) {
         const productReviewResponse = jsonResponse.productReviewResponse;
 
         return {
-            "itemId": productReviewResponse.itemId,
-            "name": productReviewResponse["name"],
-            "salePrice": productReviewResponse.salePrice,
+            "itemId": !!productReviewResponse.itemId ? productReviewResponse.itemId: "--",
+            "name": !!productReviewResponse["name"] ? productReviewResponse["name"]: "--" ,
+            "salePrice": !!productReviewResponse.salePrice ? productReviewResponse.salePrice : "--" ,
             "averageOverallRating":
             // if there is no rating info, then assuming it as zero
                 !!productReviewResponse.reviewStatistics ? productReviewResponse.reviewStatistics.averageOverallRating : "0.00"
@@ -56,7 +107,6 @@ function getProductReview(recommendedProductId) {
         },
         error: function (e) {
             console.log(e);
-            $("#errorPrint").append("An error occurred while processing your search. Please try later");
         }
     });
 }
@@ -68,8 +118,8 @@ function getRecommendedProducts(firstSearchProductId) {
         const jsonResponse = JSON.parse(response);
         const recommendedProductsResponse = jsonResponse.recommendedProductsResponse;
 
-        if (recommendedProductsResponse.length === 0) {
-            $("#errorPrint").append("No recommended products found!");
+        if (!recommendedProductsResponse || recommendedProductsResponse.length === 0) {
+            $("#messagePrint").append("No recommended products found!");
             return;
         }
 
@@ -101,7 +151,6 @@ function getRecommendedProducts(firstSearchProductId) {
         success: processRecommendedProductsResponse,
         error: function (error) {
             console.log("Error", error);
-            $("#errorPrint").append("An error occurred while processing your search. Please try later");
         }
     });
 }
@@ -111,14 +160,13 @@ function searchProduct() {
     const searchQuery = $("#form-input").val();
 
     const processProductSearchResponse = function (response) {
+        $(".loading").hide();
         const jsonResponse = JSON.parse(response);
         const searchResponse = jsonResponse.searchResponse;
-        if (searchResponse.totalResults === 0) {
-            $(".loading").hide();
-            $("#errorPrint").append("No products found!");
+        if (searchResponse.totalResults === 0 || searchResponse.errors) {
+            $("#messagePrint").html("No products found!");
             return;
         } else {
-            $(".loading").hide();
             $("#searchResultDiv").show();
             $.each(searchResponse.items, function (key, value) {
                 let customerRating = !value.customerRating ? "--" : value.customerRating;
@@ -138,8 +186,8 @@ function searchProduct() {
         data: {query: searchQuery},
         success: processProductSearchResponse,
         error: function (error) {
-            console.log("Error", error);
-            $("#errorPrint").append("An error occurred while processing your search. Please try later");
+            console.log("Error: ", error);
+            $(".loading").hide();
         }
     });
 }
