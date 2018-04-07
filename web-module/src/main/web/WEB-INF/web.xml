@@ -31,6 +31,24 @@
     <url-pattern>/ProductReviewServlet/*</url-pattern>
   </servlet-mapping>
 
+  <servlet>
+    <servlet-name>AddToCartServlet</servlet-name>
+    <servlet-class>com.chauhan.dev.walmartproductsearch.servlet.AddToCartServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddToCartServlet</servlet-name>
+    <url-pattern>/AddToCartServlet/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>ShowCartServlet</servlet-name>
+    <servlet-class>com.chauhan.dev.walmartproductsearch.servlet.ShowCartServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ShowCartServlet</servlet-name>
+    <url-pattern>/ShowCartServlet/*</url-pattern>
+  </servlet-mapping>
+
   <welcome-file-list>
     <welcome-file>index.html</welcome-file>
   </welcome-file-list>

@@ -11,67 +11,53 @@ $(document).ready(function () {
     });
 });
 
+const processCartItems = function (response) {
+    const jsonResponse = JSON.parse(response);
+    $.each(jsonResponse, function (key, value) {
+        let rowData = '<tr><td>' + value.productId + '</td><td>' + value.productName + '</td><td>' + value.productPrice
+            + '</td></tr>';
+        $('#cartBody').append(rowData);
+    });
+};
+
 // show cart items
-$(document).on('click', "button#showCart", function() {
-    $.post('view-cart.php').done(function(data) {
+$(document).on('click', "button#showCart", function () {
+    $.post('view-cart.php').done(function (data) {
         // const jsonData = JSON.parse(data);
         $("#cartResultDiv").show();
 
-        const jsonData = [
-            {
-                "ITEMID": "10291863",
-                "PRODUCTNAME": "Carnation Vitamin D Added Evaporated Milk, 12 oz",
-                "PRICE": "1.48"
-            },
-            {
-                "ITEMID": "35506194",
-                "PRODUCTNAME": "Horizon Organic 1% Organic Lowfat Milk, 8 fl oz, 6 ct",
-                "PRICE": "6.42"
-            },
-            {
-                "ITEMID": "38125809",
-                "PRODUCTNAME": "Yoo-Hoo Chocolate Milk Fridge Pack, 12 pk",
-                "PRICE": "5.78"
-            },
-            {
-                "ITEMID": "28645690",
-                "PRODUCTNAME": "Rice Dream Organic Original Rice Drink, 64 fl oz",
-                "PRICE": "3.48"
-            },
-            {
-                "ITEMID": "24389397",
-                "PRODUCTNAME": "Nestle Nesquik Chocolate Lowfat Milk, 8 fl oz, 10 count",
-                "PRICE": "7.98"
-            },
-            {
-                "ITEMID": "35506192",
-                "PRODUCTNAME": "Horizon Organic Chocolate Organic Lowfat Milk, 8 fl oz, 12 ct",
-                "PRICE": "11.98"
-            }
-        ];
-
         $('#cartBody').html("");
-        $.each(jsonData, function (key, value) {
-            let rowData = '<tr><td>' + value.ITEMID + '</td><td>' + value.PRODUCTNAME + '</td><td>' + value.PRICE
-                + '</td></tr>';
-            $('#cartBody').append(rowData);
+
+
+        $.ajax({
+            url: "ShowCartServlet",
+            type: 'GET',
+        }).error(function (response) {
+            $("#messagePrint").html("There was an error processing your request");
+        }).success(function (response) {
+            processCartItems(response);
         });
     });
 });
 
 // trigger adding to cart database
-$(document).on('click',"button.addToCart", function () {
-    $("#messagePrint").empty();
+$(document).on('click', "button.addToCart", function () {
+    $(".loading").hide();
     const rowElement = $(this).parent().parent();
     const rowData = rowElement.children("td").map(function () {
         return $(this).text();
     }).get();
 
-    const stringRowData = JSON.stringify(rowData);
-    $.post('add-to-cart.php', {stringRowData: stringRowData}).done(function (data) {
-        console.log(data);
-        $("#messagePrint").append("Added to cart! " + " <button id='showCart'>Show Cart</button>");
-    });
+    const rowDataObj = {rowData: rowData};
+    const stringRowData = JSON.stringify(rowDataObj);
+
+    $.ajax({
+        url: "AddToCartServlet",
+        type: 'GET',
+        data: {rowDataParam: stringRowData},
+    }).done(function (response) {
+        $("#messagePrint").html(response);
+    })
 });
 
 // Gets the rating of recommended products using the itemID of each recommended products
@@ -83,9 +69,9 @@ function getProductReview(recommendedProductId) {
         const productReviewResponse = jsonResponse.productReviewResponse;
 
         return {
-            "itemId": !!productReviewResponse.itemId ? productReviewResponse.itemId: "--",
-            "name": !!productReviewResponse["name"] ? productReviewResponse["name"]: "--" ,
-            "salePrice": !!productReviewResponse.salePrice ? productReviewResponse.salePrice : "--" ,
+            "itemId": !!productReviewResponse.itemId ? productReviewResponse.itemId : "--",
+            "name": !!productReviewResponse["name"] ? productReviewResponse["name"] : "--",
+            "salePrice": !!productReviewResponse.salePrice ? productReviewResponse.salePrice : "--",
             "averageOverallRating":
             // if there is no rating info, then assuming it as zero
                 !!productReviewResponse.reviewStatistics ? productReviewResponse.reviewStatistics.averageOverallRating : "0.00"
@@ -95,7 +81,7 @@ function getProductReview(recommendedProductId) {
     $.ajax({
         url: "ProductReviewServlet",
         type: 'GET',
-        data: {recommendedProductId:recommendedProductId},
+        data: {recommendedProductId: recommendedProductId},
         async: false,
         success: function (response) {
             /*
