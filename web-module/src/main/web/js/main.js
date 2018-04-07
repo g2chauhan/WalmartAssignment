@@ -2,12 +2,62 @@ $(document).ready(function () {
     $("#searchButton").on('click', function () {
         $("#recommendedProductsResultBody").empty();
         $("#searchResultBody").empty();
+        $("#messagePrint").empty();
         $("#recommendedProductsResultDiv").hide();
         $("#searchResultDiv").hide();
         window.recommendedProductsList = [];
         $(".loading").show();
         searchProduct();
     });
+});
+
+const processCartItems = function (response) {
+    const jsonResponse = JSON.parse(response);
+    $.each(jsonResponse, function (key, value) {
+        let rowData = '<tr><td>' + value.productId + '</td><td>' + value.productName + '</td><td>' + value.productPrice
+            + '</td></tr>';
+        $('#cartBody').append(rowData);
+    });
+};
+
+// show cart items
+$(document).on('click', "button#showCart", function () {
+    $.post('view-cart.php').done(function (data) {
+        // const jsonData = JSON.parse(data);
+        $("#cartResultDiv").show();
+
+        $('#cartBody').html("");
+
+
+        $.ajax({
+            url: "ShowCartServlet",
+            type: 'GET',
+        }).error(function (response) {
+            $("#messagePrint").html("There was an error processing your request");
+        }).success(function (response) {
+            processCartItems(response);
+        });
+    });
+});
+
+// trigger adding to cart database
+$(document).on('click', "button.addToCart", function () {
+    $(".loading").hide();
+    const rowElement = $(this).parent().parent();
+    const rowData = rowElement.children("td").map(function () {
+        return $(this).text();
+    }).get();
+
+    const rowDataObj = {rowData: rowData};
+    const stringRowData = JSON.stringify(rowDataObj);
+
+    $.ajax({
+        url: "AddToCartServlet",
+        type: 'GET',
+        data: {rowDataParam: stringRowData},
+    }).done(function (response) {
+        $("#messagePrint").html(response);
+    })
 });
 
 // Gets the rating of recommended products using the itemID of each recommended products
@@ -19,9 +69,9 @@ function getProductReview(recommendedProductId) {
         const productReviewResponse = jsonResponse.productReviewResponse;
 
         return {
-            "itemId": productReviewResponse.itemId,
-            "name": productReviewResponse["name"],
-            "salePrice": productReviewResponse.salePrice,
+            "itemId": !!productReviewResponse.itemId ? productReviewResponse.itemId : "--",
+            "name": !!productReviewResponse["name"] ? productReviewResponse["name"] : "--",
+            "salePrice": !!productReviewResponse.salePrice ? productReviewResponse.salePrice : "--",
             "averageOverallRating":
             // if there is no rating info, then assuming it as zero
                 !!productReviewResponse.reviewStatistics ? productReviewResponse.reviewStatistics.averageOverallRating : "0.00"
@@ -31,7 +81,7 @@ function getProductReview(recommendedProductId) {
     $.ajax({
         url: "ProductReviewServlet",
         type: 'GET',
-        data: {recommendedProductId:recommendedProductId},
+        data: {recommendedProductId: recommendedProductId},
         async: false,
         success: function (response) {
             /*
@@ -43,7 +93,6 @@ function getProductReview(recommendedProductId) {
         },
         error: function (e) {
             console.log(e);
-            $("#errorPrint").append("An error occurred while processing your search. Please try later");
         }
     });
 }
@@ -55,8 +104,8 @@ function getRecommendedProducts(firstSearchProductId) {
         const jsonResponse = JSON.parse(response);
         const recommendedProductsResponse = jsonResponse.recommendedProductsResponse;
 
-        if (recommendedProductsResponse.length === 0) {
-            $("#errorPrint").append("No recommended products found!");
+        if (!recommendedProductsResponse || recommendedProductsResponse.length === 0) {
+            $("#messagePrint").append("No recommended products found!");
             return;
         }
 
@@ -88,7 +137,6 @@ function getRecommendedProducts(firstSearchProductId) {
         success: processRecommendedProductsResponse,
         error: function (error) {
             console.log("Error", error);
-            $("#errorPrint").append("An error occurred while processing your search. Please try later");
         }
     });
 }
@@ -98,19 +146,18 @@ function searchProduct() {
     const searchQuery = $("#form-input").val();
 
     const processProductSearchResponse = function (response) {
+        $(".loading").hide();
         const jsonResponse = JSON.parse(response);
         const searchResponse = jsonResponse.searchResponse;
-        if (searchResponse.totalResults === 0) {
-            $(".loading").hide();
-            $("#errorPrint").append("No products found!");
+        if (searchResponse.totalResults === 0 || searchResponse.errors) {
+            $("#messagePrint").html("No products found!");
             return;
         } else {
-            $(".loading").hide();
             $("#searchResultDiv").show();
             $.each(searchResponse.items, function (key, value) {
                 let customerRating = !value.customerRating ? "--" : value.customerRating;
                 let rowData = '<tr><td>' + value.itemId + '</td><td>' + value.name + '</td><td>' + value.salePrice
-                    + '</td><td>' + customerRating + '</td></tr>';
+                    + '</td><td>' + customerRating + '</td><td><button class="addToCart">Add To Cart</button></td></tr>';
                 $('#searchResultBody').append(rowData);
             });
 
@@ -125,8 +172,8 @@ function searchProduct() {
         data: {query: searchQuery},
         success: processProductSearchResponse,
         error: function (error) {
-            console.log("Error", error);
-            $("#errorPrint").append("An error occurred while processing your search. Please try later");
+            console.log("Error: ", error);
+            $(".loading").hide();
         }
     });
 }
